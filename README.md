@@ -1,2 +1,2 @@
 # wz5zPracticeAutoSign
-auto sign practice data on wz5z system
+This script will sign practice data on wz5z system
