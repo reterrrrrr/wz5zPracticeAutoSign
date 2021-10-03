@@ -5,7 +5,6 @@ import httpx
 import random
 import os
 import json
-import time
 import argparse
 
 
@@ -52,7 +51,7 @@ class AutoSign():
         if _random:
             delay = random.randint(0, max_delay)
             print(delay)
-            time.sleep(delay)
+            await asyncio.sleep(delay)
 
         postData = {
             'method': 'addPracticeCheck',
