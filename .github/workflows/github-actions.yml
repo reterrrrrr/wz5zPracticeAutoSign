@@ -19,4 +19,3 @@ jobs:
           ENV_CONFIG: ${{ env.ENV_CONFIG }}$
         run : |
               python main.py
-              echo $ENV_CONFIG
