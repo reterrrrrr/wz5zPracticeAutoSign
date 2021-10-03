@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
 import asyncio
-import re
 import httpx
 import random
 import os
@@ -19,10 +18,13 @@ class AutoSign():
     def program_cli(self):
         if not self.config:
             parser = argparse.ArgumentParser(description='')
-            parser.add_argument('-c','--conf',type=str,help='conf file path',required=True)
+            parser.add_argument('-c','--conf',type=str,help='conf file path')
+            parser.add_argument('-C','--confData',type=str,help='conf data')
             args = parser.parse_args()
             if args.conf:
                 self.read_conf(args.conf)
+            if args.confData:
+                self.config == json.loads(args.confData)
 
     def read_conf(self,path):
         with open(path,'r') as f:
@@ -40,7 +42,6 @@ class AutoSign():
         _random = user_data['random']
         max_delay = user_data['max_delay']
         str5 = user_data['str5']
-        name = user_data['name']
         ua = user_data['ua']
         header = {
             'DingTalk-Flag': '1',
@@ -48,8 +49,7 @@ class AutoSign():
         }
 
         if _random:
-            delay = random.random(0,max_delay)
-            print(name,delay)
+            delay = random.randint(0,max_delay)
             time.sleep(delay)
 
         postData = {
