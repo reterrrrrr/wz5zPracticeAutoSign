@@ -17,5 +17,5 @@ jobs:
         run: python -m pip install httpx
       - name: run python script
         env:
-          ENV_CONFIG: ${{ secrets.ENV_CONFIG_ }}$
+          ENV_CONFIG: ${{ secrets.ENV_CONFIG_ }}
         run : python main.py
