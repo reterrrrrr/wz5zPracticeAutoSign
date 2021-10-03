@@ -5,12 +5,14 @@ import random
 import os
 import time
 
+
 class AutoSign():
 
     def __init__(self) -> None:
         super().__init__()
         self.read_env()
         self.sign()
+
     def read_env(self):
         self.ding_userid = os.getenv('ENV_DINGID')
         self.lng = os.getenv('ENV_LNG')
@@ -33,7 +35,7 @@ class AutoSign():
         }
 
         if self._random:
-            delay = random.randint(0,self.max_delay)
+            delay = random.randint(0, self.max_delay)
             time.sleep(delay)
 
         postData = {
@@ -44,10 +46,12 @@ class AutoSign():
             'str1': '|',
             'str5': self.str5
         }
-            
+
         with httpx.Client() as client:
-            res = client.post('http://www.wz5z.com:81/dingPractice.do',headers=header,data=postData,cookies={'ding_userid': self.ding_userid})
+            res = client.post('http://www.wz5z.com:81/dingPractice.do', headers=header,
+                              data=postData, cookies={'ding_userid': self.ding_userid})
             if res.status_code == 200:
                 pass
+
 
 sign = AutoSign()
