@@ -17,11 +17,12 @@ class AutoSign():
         self.program_cli()
 
     def program_cli(self):
-        parser = argparse.ArgumentParser(description='')
-        parser.add_argument('-c','--conf',type=str,help='conf file path')
-        args = parser.parse_args()
-        if args.conf:
-            self.read_conf(args.conf)
+        if not self.config:
+            parser = argparse.ArgumentParser(description='')
+            parser.add_argument('-c','--conf',type=str,help='conf file path',required=True)
+            args = parser.parse_args()
+            if args.conf:
+                self.read_conf(args.conf)
 
     def read_conf(self,path):
         with open(path,'r') as f:
