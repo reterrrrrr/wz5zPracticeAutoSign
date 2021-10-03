@@ -65,7 +65,7 @@ class AutoSign():
         async with httpx.AsyncClient() as client:
             res = await client.post('http://www.wz5z.com:81/dingPractice.do', headers=header, data=postData, cookies={'ding_userid': ding_userid})
             if res.status_code == 200:
-                pass
+                print(ding_userid,res.text)
 
     def run(self):
         loop = asyncio.get_event_loop()
