@@ -31,7 +31,7 @@ class AutoSign():
             self.config = json.loads(f.read())
 
     def read_env(self):
-        self.config = json.loads(os.getenv('INPUT_ENV_CONFIG'))
+        self.config = json.loads(os.getenv('ENV_CONFIG'))
 
     async def sign(self,user_data):
         print(user_data)
