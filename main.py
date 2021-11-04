@@ -18,7 +18,7 @@ class AutoSign():
         self.check_domain()
         self.sign_url = self.domain+'/dingPractice.do'
         self.renew_url = self.domain + '/dingCompanyRuleUser.do'
-        sign.auto_renew()
+        self.auto_renew()
         self.read_env()
         self.program_cli()
 
