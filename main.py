@@ -137,6 +137,7 @@ class AutoSign():
             'str1': '|',
             'str5': str5
         }
+        self.push_function_bark('[*]sign '+ding_userid+' start sign')
 
         async with httpx.AsyncClient() as client:
             res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
