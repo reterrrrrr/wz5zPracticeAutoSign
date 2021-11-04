@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.x"
       - name: Install dependencies
-        run: python -m pip install httpx
+        run: python -m pip install httpx parsel
       - name: run python script
         env:
           ENV_CONFIG: ${{ secrets.ENV_CONFIG }}
