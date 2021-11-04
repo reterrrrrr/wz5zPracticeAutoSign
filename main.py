@@ -84,8 +84,8 @@ class AutoSign():
                     self.push_function_bark('[*]renew ' +
                                             ding_userid+' start renew')
                     item_num = 0
-                    while json_data['records'][item_num]['flagStr'] == '未审核':
-                        item_num += 1
+                    # while json_data['records'][item_num]['flagStr'] == '未审核':
+                    #     item_num += 1
 
                     get_time = client.get(self.renew_url +
                                           '?method=editCompanyRuleUser&id={}&view=1'.format(json_data['records'][item_num]['recordId']), headers=header, cookies={'ding_userid': ding_userid})
@@ -139,7 +139,7 @@ class AutoSign():
             delay = random.randint(0, max_delay)
             print(delay)
             await asyncio.sleep(delay)
-            
+
         async with httpx.AsyncClient() as client:
             res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
             if res.status_code == 200:
