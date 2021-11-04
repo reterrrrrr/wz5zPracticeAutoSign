@@ -124,10 +124,6 @@ class AutoSign():
             'User-Agent': ua
         }
 
-        if _random:
-            delay = random.randint(0, max_delay)
-            print(delay)
-            await asyncio.sleep(delay)
 
         postData = {
             'method': 'addPracticeCheck',
@@ -139,6 +135,11 @@ class AutoSign():
         }
         self.push_function_bark('[*]sign '+ding_userid+' start sign')
 
+        if _random:
+            delay = random.randint(0, max_delay)
+            print(delay)
+            await asyncio.sleep(delay)
+            
         async with httpx.AsyncClient() as client:
             res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
             if res.status_code == 200:
