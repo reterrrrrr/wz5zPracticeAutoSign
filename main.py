@@ -40,7 +40,7 @@ class AutoSign():
 
     def push_function_bark(self, push_data):
         res = httpx.get(
-            'https://api.day.app/vAGNHw7EDXTu93JbmK3PDJ/%s?level=timeSensitive'%push_data)
+            'https://api.day.app/vAGNHw7EDXTu93JbmK3PDJ/%s?level=timeSensitive' % push_data)
         return res
 
     def check_domain(self):
@@ -80,8 +80,8 @@ class AutoSign():
                 json_data = json.loads(user_sign_time.text)
                 if datetime.datetime.strptime(json_data['records'][0]['endDate'], r'%Y-%m-%d').__sub__(datetime.datetime.now()).days < 3:
                     print('[*]renew '+ding_userid, 'start renew')
-                    self.push_function_bark('[*]renew '+
-                        ding_userid+' start renew')
+                    self.push_function_bark('[*]renew ' +
+                                            ding_userid+' start renew')
                     item_num = 0
                     while json_data['records'][item_num]['flagStr'] == '未审核':
                         item_num += 1
@@ -104,8 +104,8 @@ class AutoSign():
                     }
                     res = client.post(self.renew_url, headers=header,
                                       cookies={'ding_userid': ding_userid}, data=renew_data)
-                    self.push_function_bark('[*]renew '+
-                            ding_userid+' '+res.text)
+                    self.push_function_bark('[*]renew ' +
+                                            ding_userid+' '+res.text)
                     print('[*]renew ' +
                           ding_userid+' '+res.text)
 
@@ -154,4 +154,3 @@ class AutoSign():
 
 sign = AutoSign()
 sign.run()
-
