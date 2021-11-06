@@ -93,7 +93,7 @@ class AutoSign():
     def push_function_bark(self, push_data):
         if self.barkid != '':
             res = httpx.get(
-                'https://api.day.app/%s/%s?level=timeSensitive' % self.barkid,push_data)
+                'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid,push_data))
             return res
         else:
             return None
