@@ -6,9 +6,6 @@ import httpx
 from parsel import Selector
 import time
 
-from six import with_metaclass
-
-
 def get_ding_id():
     class GetDingUserId:
 
@@ -94,7 +91,7 @@ def write_info_to_file():
         )
     with open('ding_userid.txt', 'w') as f:
         f.write(ding_user_id)
-    with open('info.txt', 'w',encoding='utf-8') as f:
+    with open('info.txt', 'w', encoding='utf-8') as f:
         f.write('ding_id '+ding_user_id+'\n')
         f.write('lng ' + lng+'\n')
         f.write('lat ' + lat+'\n')
