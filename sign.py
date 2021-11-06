@@ -23,17 +23,68 @@ class AutoSign():
         self.auto_renew()
         self.run()
 
+    def getInfoByDingUserId(self, ding_user_id):
+        ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/19A348 AliApp(DingTalk/6.3.7) com.laiwang.DingTalk/21728861 Channel/201200 language/en-CN UT4Aplus/0.0.6 WK'
+        header = {
+            'DingTalk-Flag': '1',
+            'User-Agent': ua
+        }
+        cookie = {'ding_userid': ding_user_id}
+        print('[+]start to get other info')
+
+        def get_recoed_id():
+            url = 'http://218.75.25.135:81/dingPracticeApply.do?method=getPracticeApplyList&str1=&num1=1&num2=100'
+            # {"records": [{"userName": "***", "userCode": "***", "recordId": ***, "companyName": "***", "reason": "***", "flagStr": "***"}],"count":1,"statusCode": 200}
+            with httpx.Client() as client:
+                req = client.get(url, headers=header, cookies=cookie)
+                recordid = json.loads(req.text)['records'][0]['recordId']
+            return recordid
+
+        def getInfoByRecordId():
+            url = 'http://218.75.25.135:81/dingPracticeApply.do?method=editPracticeApply&id={}&view=1'.format(
+                get_recoed_id())
+            with httpx.Client() as client:
+                req = client.get(url, headers=header, cookies=cookie)
+                return req.text
+
+        def findInfoFromHtml():
+            sel = Selector(getInfoByRecordId())
+            lng = sel.css('#lng::attr(value)').get()
+            lat = sel.css('#lat::attr(value)').get()
+            companyid = sel.css('#i1::attr(value)').get()
+            str5 = sel.css('#bdate::attr(value)').get()
+            # i2 = sel.css('#i2::attr(value)').get()
+            self.config += [
+                {
+                    "ding_id": ding_user_id,
+                    "lng": lng,
+                    "lat": lat,
+                    "companyId": companyid,
+                    "random": True,
+                    "max_delay": 1800,
+                    "str5": str5,
+                    "ua": ua
+                }
+            ]
+        findInfoFromHtml()
+
     def program_cli(self):
         if not self.config:
             parser = argparse.ArgumentParser(description='')
             parser.add_argument('-c', '--conf', type=str,
                                 help='conf file path')
             parser.add_argument('-C', '--confData', type=str, help='conf data')
+            parser.add_argument('-d', '--dinguserid',
+                                type=str, help='dinguserid')
             args = parser.parse_args()
             if args.conf:
                 self.read_conf(args.conf)
             if args.confData:
                 self.config == json.loads(args.confData)
+            if args.dinguserid:
+                for i in args.dinguserid.split(','):
+                    print(i)
+                    self.getInfoByDingUserId(i)
 
     def read_conf(self, path):
         with open(path, 'r') as f:
@@ -56,6 +107,9 @@ class AutoSign():
                     res = client.get('http://218.75.25.135:81')
                     if res.status_code == 200:
                         self.domain = 'http://218.75.25.135:81'
+                        res = self.push_function_bark(
+                            'server dns is error'
+                        )
 
                 except:
                     res = self.push_function_bark(
@@ -65,7 +119,17 @@ class AutoSign():
                         sys.exit(0)
 
     def read_env(self):
-        self.config = json.loads(os.getenv('ENV_CONFIG'))
+        try:
+            self.config = json.loads(os.getenv('ENV_CONFIG'))
+        except TypeError:
+            self.config = []
+        try:
+            dinguserid = os.getenv('ENV_DINGUSERID')
+            print(dinguserid)
+            for i in dinguserid.split(','):
+                self.getInfoByDingUserId(i)
+        except TypeError:
+            self.config = []
 
     def auto_renew(self):
         for i in self.config:
@@ -84,8 +148,6 @@ class AutoSign():
                     self.push_function_bark('[*]renew ' +
                                             ding_userid+' start renew')
                     item_num = 0
-                    # while json_data['records'][item_num]['flagStr'] == '未审核':
-                    #     item_num += 1
 
                     get_time = client.get(self.renew_url +
                                           '?method=editCompanyRuleUser&id={}&view=1'.format(json_data['records'][item_num]['recordId']), headers=header, cookies={'ding_userid': ding_userid})
@@ -124,7 +186,6 @@ class AutoSign():
             'User-Agent': ua
         }
 
-
         postData = {
             'method': 'addPracticeCheck',
             'lng': lng,
@@ -156,4 +217,3 @@ class AutoSign():
 
 
 sign = AutoSign()
-

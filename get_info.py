@@ -80,16 +80,17 @@ def get_other_info():
 def write_info_to_file():
     with open('config.json', 'w') as f:
         f.write(
-            json.dumps(
+            json.dumps([
                 {
-                    'ding_id': ding_user_id,
-                    'lng': lng,
-                    'lat': lat,
-                    'companyId': companyid,
-                    'str5': str5,
-                    'i2': i2
-                }
-            )
+                    "ding_id": ding_user_id,
+                    "lng": lng,
+                    "lat": lat,
+                    "companyId": companyid,
+                    "random": True,
+                    "max_delay": 1800,
+                    "str5": str5,
+                    "ua": 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/19A348 AliApp(DingTalk/6.3.7) com.laiwang.DingTalk/21728861 Channel/201200 language/en-CN UT4Aplus/0.0.6 WK'
+                }])
         )
     with open('ding_userid.txt', 'w') as f:
         f.write(ding_user_id)
