@@ -131,7 +131,7 @@ class AutoSign():
             print(dinguserid)
             for i in dinguserid.split(','):
                 self.getInfoByDingUserId(i)
-        except TypeError:
+        except:
             self.config = []
         try:
             self.barkid = os.getenv('ENV_BARKID')
