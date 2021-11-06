@@ -17,4 +17,4 @@ jobs:
       - name: run python script
         env:
           ENV_CONFIG: ${{ secrets.ENV_CONFIG }}
-        run: python main.py
+        run: python sign.py
