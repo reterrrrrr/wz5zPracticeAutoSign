@@ -91,8 +91,16 @@ def write_info_to_file():
                 }
             )
         )
-    with open('ding_userid.txt','w') as f:
+    with open('ding_userid.txt', 'w') as f:
         f.write(ding_user_id)
+    with open('info.txt', 'w',encoding='utf-8') as f:
+        f.write('ding_id '+ding_user_id+'\n')
+        f.write('lng ' + lng+'\n')
+        f.write('lat ' + lat+'\n')
+        f.write('companyid ' + companyid+'\n')
+        f.write('str5 ' + str5+'\n')
+        f.write('i2 ' + i2+'\n')
+
 
 get_ding_id()
 get_other_info()
