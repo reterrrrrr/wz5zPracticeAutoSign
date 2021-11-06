@@ -61,7 +61,7 @@ class AutoSign():
                     "lat": lat,
                     "companyId": companyid,
                     "random": True,
-                    "max_delay": 1800,
+                    "max_delay": 900,
                     "str5": str5,
                     "ua": ua
                 }
