@@ -116,7 +116,8 @@ class AutoSign():
 
                 except:
                     res = self.push_function_bark(
-                        'sign faile\nserver is offline')
+                        'sign faile\nserver is offline'
+                    )
                     if res.status_code == 200:
                         print('server offline\npush done')
                         sys.exit(0)
