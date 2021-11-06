@@ -132,7 +132,10 @@ class AutoSign():
             for i in dinguserid.split(','):
                 self.getInfoByDingUserId(i)
         except:
-            self.config = []
+            if self.config:
+                pass
+            else:
+                self.config = []
         try:
             self.barkid = os.getenv('ENV_BARKID')
         except:
