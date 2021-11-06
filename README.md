@@ -14,3 +14,4 @@ set dinguserid to env ENV_DINGUSERID or use -d to point dinguserid if you want u
 
 you can get you dinguserid via get_info.py
 if you should executable file please vist the [release](https://github.com/reterrrrrr/wz5zPracticeAutoSign/releases/tag/v1.0.0a)
+[shortcuts](https://www.icloud.com/shortcuts/8a7c985f58a14a20b8ff9156cccf8d18)
