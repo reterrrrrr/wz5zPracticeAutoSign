@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import asyncio
+from re import T
 import sys
 import httpx
 import random
@@ -93,7 +94,7 @@ class AutoSign():
     def push_function_bark(self, push_data):
         if self.barkid != '':
             res = httpx.get(
-                'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid,push_data))
+                'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid, push_data))
             return res
         else:
             return None
@@ -211,12 +212,18 @@ class AutoSign():
             delay = random.randint(0, max_delay)
             print(delay)
             await asyncio.sleep(delay)
-
-        async with httpx.AsyncClient() as client:
-            res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
-            if res.status_code == 200:
-                print('[*]sign '+ding_userid, res.text)
-                self.push_function_bark('[*]sign '+ding_userid+' '+res.text)
+        success = False
+        while not success:
+            try:
+                async with httpx.AsyncClient() as client:
+                    res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
+                    if res.status_code == 200:
+                        print('[*]sign '+ding_userid, res.text)
+                        self.push_function_bark(
+                            '[*]sign '+ding_userid+' '+res.text)
+                        success = True
+            except:
+                pass
 
     def run(self):
         loop = asyncio.get_event_loop()
