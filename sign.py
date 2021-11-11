@@ -188,7 +188,7 @@ class AutoSign():
                 user_sign_time = client.get(self.renew_url +
                                             '?method=getCompanyRuleUserList&name=&num1=1&num2=100', headers=header, cookies={'ding_userid': ding_userid})
                 json_data = json.loads(user_sign_time.text)
-                if datetime.datetime.strptime(json_data['records'][0]['endDate'], r'%Y-%m-%d').__sub__(datetime.datetime.now()).days < 3:
+                if datetime.datetime.strptime(json_data['records'][0]['endDate'], r'%Y-%m-%d').__sub__(datetime.timedelta(hours=8) + datetime.datetime.utcnow()).days < 3:
                     print('[*]renew '+ding_userid, 'start renew')
                     self.push_function_bark('[*]renew ' +
                                             ding_userid+' start renew')
@@ -245,9 +245,9 @@ class AutoSign():
         if _random and not error:
             delay = random.randint(0, max_delay)
             print('[*]delay:', delay)
-            print('[*]'+ding_userid, 'will sign at', datetime.datetime.strftime(datetime.datetime.now() +
+            print('[*]'+ding_userid, 'will sign at', datetime.datetime.strftime(datetime.timedelta(hours=8) + datetime.datetime.utcnow() +
                   datetime.timedelta(seconds=delay), r'%X'))
-            self.push_function_bark(ding_userid + ' will sign at ' + datetime.datetime.strftime(datetime.datetime.now() +
+            self.push_function_bark(ding_userid + ' will sign at ' + datetime.datetime.strftime(datetime.timedelta(hours=8) + datetime.datetime.utcnow() +
                                                                                                 datetime.timedelta(seconds=delay), r'%X'))
             await asyncio.sleep(delay)
             await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
