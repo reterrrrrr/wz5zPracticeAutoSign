@@ -27,6 +27,7 @@ def set_error_state(error_):
 
 
 def error_callback(retry_state):
+    
     sys.exit(1)
 
 
@@ -35,8 +36,8 @@ class AutoSign():
     def __init__(self) -> None:
         super().__init__()
         self.read_env()
-        self.check_domain()
         self.program_cli()
+        self.check_domain()
         self.sign_url = self.domain+'/dingPractice.do'
         self.renew_url = self.domain + '/dingCompanyRuleUser.do'
         self.auto_renew()
@@ -89,28 +90,28 @@ class AutoSign():
         findInfoFromHtml()
 
     def program_cli(self):
-        if not self.config:
-            parser = argparse.ArgumentParser(description='')
-            parser.add_argument('-c', '--conf', type=str,
-                                help='conf file path')
-            parser.add_argument('-C', '--confData', type=str, help='conf data')
-            parser.add_argument('-d', '--dinguserid',
-                                type=str, help='dinguserid')
-            parser.add_argument('-b', '--barkid', type=str, help='barkid')
-            args = parser.parse_args()
-            if args.conf:
-                self.read_conf(args.conf)
-            if args.confData:
-                self.config == json.loads(args.confData)
-            if args.dinguserid:
-                for i in args.dinguserid.split(','):
-                    self.getInfoByDingUserId(i)
-            else:
+        parser = argparse.ArgumentParser(description='')
+        parser.add_argument('-c', '--conf', type=str,
+                            help='conf file path')
+        parser.add_argument('-C', '--confData', type=str, help='conf data')
+        parser.add_argument('-d', '--dinguserid',
+                            type=str, help='dinguserid')
+        parser.add_argument('-b', '--barkid', type=str, help='barkid')
+        args = parser.parse_args()
+        if args.conf:
+            self.read_conf(args.conf)
+        if args.confData:
+            self.config == json.loads(args.confData)
+        if args.dinguserid:
+            for i in args.dinguserid.split(','):
+                self.getInfoByDingUserId(i)
+        else:
+            if not self.config:
                 print("can't find dinguserid")
                 parser.print_help()
                 sys.exit(1)
-            if args.barkid:
-                self.barkid = args.barkid
+        if args.barkid:
+            self.barkid = args.barkid
 
     def read_conf(self, path):
         with open(path, 'r') as f:
