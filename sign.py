@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import asyncio
-from re import T
+from tenacity import retry, stop_after_attempt, wait_fixed
 import sys
 import httpx
 import random
@@ -11,16 +11,34 @@ import argparse
 from parsel import Selector
 import datetime
 
+error = False
+error_counter = 0
+
+
+def set_error_state(error_):
+    global error
+    global error_counter
+    error = True
+    error_counter += 1
+    print('retrying...')
+    print('error func:', error_.fn.__name__)
+    print('error counter:', error_.attempt_number)
+    print('total error counter', error_counter)
+
+
+def error_callback(retry_state):
+    sys.exit(1)
+
 
 class AutoSign():
 
     def __init__(self) -> None:
         super().__init__()
+        self.read_env()
         self.check_domain()
+        self.program_cli()
         self.sign_url = self.domain+'/dingPractice.do'
         self.renew_url = self.domain + '/dingCompanyRuleUser.do'
-        self.read_env()
-        self.program_cli()
         self.auto_renew()
         self.run()
 
@@ -31,7 +49,7 @@ class AutoSign():
             'User-Agent': ua
         }
         cookie = {'ding_userid': ding_user_id}
-        print('[+]start to get other info')
+        print('[*]start to get other info')
 
         def get_recoed_id():
             url = 'http://218.75.25.135:81/dingPracticeApply.do?method=getPracticeApplyList&str1=&num1=1&num2=100'
@@ -39,7 +57,7 @@ class AutoSign():
             with httpx.Client() as client:
                 req = client.get(url, headers=header, cookies=cookie)
                 recordid = json.loads(req.text)['records'][0]['recordId']
-            return recordid
+                return recordid
 
         def getInfoByRecordId():
             url = 'http://218.75.25.135:81/dingPracticeApply.do?method=editPracticeApply&id={}&view=1'.format(
@@ -48,6 +66,7 @@ class AutoSign():
                 req = client.get(url, headers=header, cookies=cookie)
                 return req.text
 
+        @retry(stop=stop_after_attempt(5), wait=wait_fixed(5), after=set_error_state, retry_error_callback=error_callback)
         def findInfoFromHtml():
             sel = Selector(getInfoByRecordId())
             lng = sel.css('#lng::attr(value)').get()
@@ -77,6 +96,7 @@ class AutoSign():
             parser.add_argument('-C', '--confData', type=str, help='conf data')
             parser.add_argument('-d', '--dinguserid',
                                 type=str, help='dinguserid')
+            parser.add_argument('-b', '--barkid', type=str, help='barkid')
             args = parser.parse_args()
             if args.conf:
                 self.read_conf(args.conf)
@@ -84,21 +104,29 @@ class AutoSign():
                 self.config == json.loads(args.confData)
             if args.dinguserid:
                 for i in args.dinguserid.split(','):
-                    print(i)
                     self.getInfoByDingUserId(i)
+            else:
+                print("can't find dinguserid")
+                parser.print_help()
+                sys.exit(1)
+            if args.barkid:
+                self.barkid = args.barkid
 
     def read_conf(self, path):
         with open(path, 'r') as f:
             self.config = json.loads(f.read())
 
+    @retry(stop=stop_after_attempt(5), reraise=True, wait=wait_fixed(10), after=set_error_state, retry_error_callback=error_callback)
     def push_function_bark(self, push_data):
         if self.barkid != '':
             res = httpx.get(
                 'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid, push_data))
-            return res
+            if res.status_code == 200:
+                return res
         else:
             return None
 
+    @retry(stop=stop_after_attempt(6), wait=wait_fixed(20), retry_error_callback=error_callback, reraise=True, after=set_error_state)
     def check_domain(self):
         with httpx.Client() as client:
             try:
@@ -119,9 +147,11 @@ class AutoSign():
                     res = self.push_function_bark(
                         'sign faile\nserver is offline'
                     )
+                    if res == None:
+                        print("network error")
+
                     if res.status_code == 200:
                         print('server offline\npush done')
-                        sys.exit(0)
 
     def read_env(self):
         try:
@@ -130,9 +160,9 @@ class AutoSign():
             self.config = []
         try:
             dinguserid = os.getenv('ENV_DINGUSERID')
-            print(dinguserid)
-            for i in dinguserid.split(','):
-                self.getInfoByDingUserId(i)
+            if dinguserid != None:
+                for i in dinguserid.split(','):
+                    self.getInfoByDingUserId(i)
         except:
             if self.config:
                 pass
@@ -140,9 +170,12 @@ class AutoSign():
                 self.config = []
         try:
             self.barkid = os.getenv('ENV_BARKID')
+            if self.barkid == None:
+                self.barkid = ''
         except:
             self.barkid = ''
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback)
     def auto_renew(self):
         for i in self.config:
             ding_userid = i['ding_id']
@@ -184,6 +217,7 @@ class AutoSign():
                     print('[*]renew ' +
                           ding_userid+' '+res.text)
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback)
     async def sign(self, user_data):
         ding_userid = user_data['ding_id']
         lng = user_data['lng']
@@ -206,24 +240,29 @@ class AutoSign():
             'str1': '|',
             'str5': str5
         }
+        print('[*]sign '+ding_userid+' start sign')
         self.push_function_bark('[*]sign '+ding_userid+' start sign')
-
-        if _random:
+        if _random and not error:
             delay = random.randint(0, max_delay)
-            print(delay)
+            print('[*]delay:', delay)
+            print('[*]'+ding_userid, 'will sign at', datetime.datetime.strftime(datetime.datetime.now() +
+                  datetime.timedelta(seconds=delay), r'%X'))
+            self.push_function_bark(ding_userid + ' will sign at ' + datetime.datetime.strftime(datetime.datetime.now() +
+                                                                                                datetime.timedelta(seconds=delay), r'%X'))
             await asyncio.sleep(delay)
-        success = False
-        while not success:
-            try:
-                async with httpx.AsyncClient() as client:
-                    res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
-                    if res.status_code == 200:
-                        print('[*]sign '+ding_userid, res.text)
-                        self.push_function_bark(
-                            '[*]sign '+ding_userid+' '+res.text)
-                        success = True
-            except:
-                pass
+            await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
+        else:
+            print('[*]runtime error skip delay')
+            await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
+
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback)
+    async def sender_data(self, header, postData, ding_userid):
+        async with httpx.AsyncClient() as client:
+            res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
+            if res.status_code == 200:
+                print('[*]sign '+ding_userid, res.text)
+                self.push_function_bark(
+                    '[*]sign '+ding_userid+' '+res.text)
 
     def run(self):
         loop = asyncio.get_event_loop()
