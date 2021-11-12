@@ -17,4 +17,5 @@ jobs:
       - name: run python script
         env:
           ENV_CONFIG: ${{ secrets.ENV_CONFIG_ }}
+          ENV_BARKID: ${{ secrets.ENV_BARKID }}
         run: python sign.py
