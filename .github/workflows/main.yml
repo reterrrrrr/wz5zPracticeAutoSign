@@ -1,4 +1,4 @@
-name: auto sign 2 p.m.
+name: auto sign 1 p.m.
 on:
   workflow_dispatch:
   schedule:
@@ -16,6 +16,6 @@ jobs:
         run: python -m pip install httpx parsel tenacity
       - name: run python script
         env:
-          ENV_DINGUSERID: ${{ secrets.ENV_DINGUSERID_2_PM }}
+          ENV_DINGUSERID: ${{ secrets.ENV_DINGUSERID_1_PM }}
           ENV_BARKID: ${{ secrets.ENV_BARKID }}
         run: python sign.py
