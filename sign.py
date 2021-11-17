@@ -13,7 +13,7 @@ import datetime
 
 error = False
 error_counter = 0
-
+delay_state = True
 
 def set_error_state(error_):
     global error
@@ -27,7 +27,7 @@ def set_error_state(error_):
 
 
 def error_callback(retry_state):
-    
+    print(retry_state.outcome)
     sys.exit(1)
 
 
@@ -97,6 +97,7 @@ class AutoSign():
         parser.add_argument('-d', '--dinguserid',
                             type=str, help='dinguserid')
         parser.add_argument('-b', '--barkid', type=str, help='barkid')
+        parser.add_argument('-D','--delay',type=int,help='delay 0:False 1:True')
         args = parser.parse_args()
         if args.conf:
             self.read_conf(args.conf)
@@ -112,6 +113,9 @@ class AutoSign():
                 sys.exit(1)
         if args.barkid:
             self.barkid = args.barkid
+        if args.delay != None:
+            global delay_state
+            delay_state = args.delay
 
     def read_conf(self, path):
         with open(path, 'r') as f:
@@ -176,7 +180,7 @@ class AutoSign():
         except:
             self.barkid = ''
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback)
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, after=set_error_state,retry_error_callback=error_callback)
     def auto_renew(self):
         for i in self.config:
             ding_userid = i['ding_id']
@@ -243,7 +247,7 @@ class AutoSign():
         }
         print('[*]sign '+ding_userid+' start sign')
         self.push_function_bark('[*]sign '+ding_userid+' start sign')
-        if _random and not error:
+        if _random and not error and delay_state:
             delay = random.randint(0, max_delay)
             print('[*]delay:', delay)
             print('[*]'+ding_userid, 'will sign at', datetime.datetime.strftime(datetime.timedelta(hours=8) + datetime.datetime.utcnow() +
@@ -253,7 +257,7 @@ class AutoSign():
             await asyncio.sleep(delay)
             await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
         else:
-            print('[*]runtime error skip delay')
+            print('[*]runtime error or delay set false skip delay')
             await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
 
     @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback)
