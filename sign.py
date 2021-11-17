@@ -24,7 +24,7 @@ def set_error_state(error_):
     print('error func:', error_.fn.__name__)
     print('error counter:', error_.attempt_number)
     print('total error counter', error_counter)
-    print('error: ', retry_state.outcome)
+    print('error: ', error_.outcome)
 
 
 def error_callback(retry_state):
