@@ -29,6 +29,10 @@ def set_error_state(error_):
 
 def error_callback(retry_state):
     print(retry_state.outcome)
+    try:
+        sign.push_function_bark('sign error')
+    except:
+        pass
     sys.exit(1)
 
 
@@ -68,7 +72,7 @@ class AutoSign():
                 req = client.get(url, headers=header, cookies=cookie)
                 return req.text
 
-        @retry(stop=stop_after_attempt(5), wait=wait_fixed(5), after=set_error_state, retry_error_callback=error_callback)
+        @retry(stop=stop_after_attempt(12), wait=wait_fixed(10), after=set_error_state, retry_error_callback=error_callback)
         def findInfoFromHtml():
             sel = Selector(getInfoByRecordId())
             lng = sel.css('#lng::attr(value)').get()
@@ -122,7 +126,7 @@ class AutoSign():
         with open(path, 'r') as f:
             self.config = json.loads(f.read())
 
-    @retry(stop=stop_after_attempt(5), reraise=True, wait=wait_fixed(10), retry_error_callback=error_callback)
+    @retry(stop=stop_after_attempt(3), reraise=True, wait=wait_fixed(10), retry_error_callback=error_callback)
     def push_function_bark(self, push_data):
         if self.barkid != '':
             res = httpx.get(
@@ -132,7 +136,7 @@ class AutoSign():
         else:
             return None
 
-    @retry(stop=stop_after_attempt(6), wait=wait_fixed(20), retry_error_callback=error_callback, reraise=True, after=set_error_state)
+    @retry(stop=stop_after_attempt(12), wait=wait_fixed(20), retry_error_callback=error_callback, reraise=True, after=set_error_state)
     def check_domain(self):
         with httpx.Client() as client:
             try:
@@ -181,7 +185,7 @@ class AutoSign():
         except:
             self.barkid = ''
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, after=set_error_state,retry_error_callback=error_callback)
+    @retry(stop=stop_after_attempt(12), wait=wait_fixed(20), reraise=True, after=set_error_state,retry_error_callback=error_callback)
     def auto_renew(self):
         for i in self.config:
             ding_userid = i['ding_id']
@@ -223,7 +227,7 @@ class AutoSign():
                     print('[*]renew ' +
                           ding_userid+' '+res.text)
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, retry_error_callback=error_callback,after=set_error_state)
+    @retry(stop=stop_after_attempt(12), wait=wait_fixed(20), reraise=True, retry_error_callback=error_callback,after=set_error_state)
     async def sign(self, user_data):
         ding_userid = user_data['ding_id']
         lng = user_data['lng']
@@ -261,7 +265,7 @@ class AutoSign():
             print('[*]runtime error or delay set false skip delay')
             await self.sender_data(header=header, postData=postData, ding_userid=ding_userid)
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(30), reraise=True, after=set_error_state,retry_error_callback=error_callback)
+    @retry(stop=stop_after_attempt(12), wait=wait_fixed(20), reraise=True, after=set_error_state,retry_error_callback=error_callback)
     async def sender_data(self, header, postData, ding_userid):
         async with httpx.AsyncClient() as client:
             res = await client.post(self.sign_url, headers=header, data=postData, cookies={'ding_userid': ding_userid})
