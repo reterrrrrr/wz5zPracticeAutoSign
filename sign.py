@@ -40,9 +40,9 @@ class AutoSign():
 
     def __init__(self) -> None:
         super().__init__()
+        self.check_domain()
         self.read_env()
         self.program_cli()
-        self.check_domain()
         self.sign_url = self.domain+'/dingPractice.do'
         self.renew_url = self.domain + '/dingCompanyRuleUser.do'
         self.auto_renew()
@@ -129,10 +129,13 @@ class AutoSign():
     @retry(stop=stop_after_attempt(3), reraise=True, wait=wait_fixed(10), retry_error_callback=error_callback)
     def push_function_bark(self, push_data):
         if self.barkid != '':
-            res = httpx.get(
-                'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid, push_data))
-            if res.status_code == 200:
-                return res
+            try:
+                res = httpx.get(
+                    'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid, push_data))
+                if res.status_code == 200:
+                    return res
+            except:
+                return None
         else:
             return None
 
