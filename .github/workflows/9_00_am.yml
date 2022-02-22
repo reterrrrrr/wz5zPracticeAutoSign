@@ -1,4 +1,4 @@
-name: auto sign 1 00 pm
+name: auto sign 10 00 am
 on:
   workflow_dispatch:
   schedule:
