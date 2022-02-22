@@ -6,6 +6,8 @@ This script will sign practice data on wz5z system use the github actions
 
 [![auto sign d](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/main.yml/badge.svg)](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/main.yml)
 
+[![auto sign 10 00 am](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/9_00_am.yml/badge.svg?branch=main)](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/9_00_am.yml)
+
 set dinguserid to env ENV_DINGUSERID or use -d to point dinguserid if you want use custom config please according the this format:
 
 ~~~json
