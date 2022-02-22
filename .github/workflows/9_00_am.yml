@@ -1,0 +1,21 @@
+name: auto sign 1 00 pm
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9.8"
+      - name: Install dependencies
+        run: python -m pip install httpx parsel tenacity
+      - name: run python script
+        env:
+          ENV_DINGUSERID: ${{ secrets.ENV_DINGUSERID_10_AM }}
+          ENV_BARKID: ${{ secrets.ENV_BARKID }}
+        run: python sign.py
