@@ -2,7 +2,7 @@
 
 This script will sign practice data on wz5z system use the github actions
 
-[![auto sign](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/github-actions.yml/badge.svg)](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/github-actions.yml)
+[![auto sign at 7 55 am](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/7_55_am.yml/badge.svg)](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/7_55_am.yml)
 
 [![auto sign d](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/main.yml/badge.svg)](https://github.com/reterrrrrr/wz5zPracticeAutoSign/actions/workflows/main.yml)
 
