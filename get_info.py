@@ -40,7 +40,8 @@ def get_other_info():
         # {"records": [{"userName": "***", "userCode": "***", "recordId": ***, "companyName": "***", "reason": "***", "flagStr": "***"}],"count":1,"statusCode": 200}
         with httpx.Client() as client:
             req = client.get(url, headers=header, cookies=cookie)
-            recordid = json.loads(req.text)['records'][0]['recordId']
+            print(req.text)
+            recordid = json.loads(req.text)['records'][-1]['recordId']
         return recordid
 
     def getInfoByRecordId():
