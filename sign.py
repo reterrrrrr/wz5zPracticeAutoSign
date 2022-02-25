@@ -103,6 +103,7 @@ class AutoSign():
                             type=str, help='dinguserid')
         parser.add_argument('-b', '--barkid', type=str, help='barkid')
         parser.add_argument('-D','--delay',type=int,help='delay 0:False 1:True')
+        parser.add_argument('-B','--bark_server_addr',type=str,help='please enter the bark server addr')
         args = parser.parse_args()
         if args.conf:
             self.read_conf(args.conf)
@@ -118,6 +119,10 @@ class AutoSign():
                 sys.exit(1)
         if args.barkid:
             self.barkid = args.barkid
+        if args.bark_server_addr:
+            self.bark_server_addr = args.bark_server_addr
+        else:
+            self.bark_server_addr = 'https://api.day.app/'
         if args.delay != None:
             global delay_state
             delay_state = args.delay
@@ -130,8 +135,20 @@ class AutoSign():
     def push_function_bark(self, push_data):
         if self.barkid != '':
             try:
-                res = httpx.get(
-                    'https://api.day.app/%s/%s?level=timeSensitive' % (self.barkid, push_data))
+                res = httpx.post(
+                    url=self.bark_server_addr+'/push',
+                    headers = {
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                    data=json.dumps({
+                        "body": push_data,
+                        "device_key": self.barkid,
+                        "titile": "Sign Notice",
+                        "level": "timeSensitive"
+                    })
+                )
+                # res = httpx.get(
+                #     self.bark_server_addr+'%s/%s?level=timeSensitive' % (self.barkid, push_data))
                 if res.status_code == 200:
                     return res
             except:
@@ -187,6 +204,12 @@ class AutoSign():
                 self.barkid = ''
         except:
             self.barkid = ''
+        try:
+            self.bark_server_addr = os.getenv('ENV_BARKSERVERADDR')
+            if self.barkid == None:
+                self.bark_server_addr = 'https://api.day.app/'
+        except:
+            self.bark_server_addr = "https://api.day.app/"
 
     @retry(stop=stop_after_attempt(24), wait=wait_fixed(20), reraise=True, after=set_error_state,retry_error_callback=error_callback)
     def auto_renew(self):
