@@ -224,7 +224,7 @@ class AutoSign():
                 user_sign_time = client.get(self.renew_url +
                                             '?method=getCompanyRuleUserList&name=&num1=1&num2=100', headers=header, cookies={'ding_userid': ding_userid})
                 json_data = json.loads(user_sign_time.text)
-                if datetime.datetime.strptime(json_data['records'][0]['endDate'], r'%Y-%m-%d').__sub__(datetime.timedelta(hours=8) + datetime.datetime.utcnow()).days < 7:
+                if datetime.datetime.strptime(json_data['records'][0]['endDate'], r'%Y-%m-%d').__sub__(datetime.timedelta(hours=8) + datetime.datetime.utcnow()).days < 31:
                     print('[*]renew '+ding_userid, 'start renew')
                     self.push_function_bark('[*]renew ' +
                                             ding_userid+' start renew')
