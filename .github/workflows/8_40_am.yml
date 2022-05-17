@@ -2,7 +2,7 @@ name: auto sign 10 00 am
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "40 0 * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
